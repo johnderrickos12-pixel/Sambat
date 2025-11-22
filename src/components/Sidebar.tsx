@@ -1,43 +1,37 @@
 import React from 'react';
-import { PanelLeft, Github, Bot, Code2, Settings } from 'lucide-react';
 import { FileTree } from './FileTree';
-import { mockFiles } from '../data/mockData';
+import { mockFileTree } from '../data/mockData';
+import { Search } from 'lucide-react';
 
-export const Sidebar: React.FC = () => {
+interface SidebarProps {
+  selectedFile: string | null;
+  onSelectFile: (path: string) => void;
+}
+
+export const Sidebar: React.FC<SidebarProps> = ({ selectedFile, onSelectFile }) => {
   return (
-    <div className="flex flex-col h-screen w-64 bg-gray-900 text-white border-r border-gray-700">
-      <div className="flex items-center justify-between p-4 border-b border-gray-700">
-        <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500" />
-          <span className="font-semibold">Sambat</span>
-        </div>
-        <button className="p-1 rounded hover:bg-gray-800">
-          <PanelLeft size={20} />
-        </button>
+    <aside className="bg-[#121212] w-64 p-4 flex flex-col border-r border-gray-800">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold text-gray-200">Files</h2>
       </div>
-      <div className="flex-grow p-2 overflow-y-auto">
-        <FileTree files={mockFiles} />
+      <div className="relative mb-4">
+        <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+        <input
+          type="text"
+          placeholder="Search files..."
+          className="w-full bg-[#1e1e1e] border border-gray-700 rounded-md pl-8 pr-2 py-1.5 text-sm text-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+        />
       </div>
-      <div className="p-4 border-t border-gray-700">
-        <nav className="flex flex-col space-y-2">
-          <a href="#" className="flex items-center space-x-3 px-2 py-1.5 rounded text-sm text-gray-400 hover:bg-gray-800 hover:text-white">
-            <Github size={18} />
-            <span>johnderrickos12-pixel/Sambat</span>
-          </a>
-          <a href="#" className="flex items-center space-x-3 px-2 py-1.5 rounded text-sm text-gray-400 hover:bg-gray-800 hover:text-white">
-            <Bot size={18} />
-            <span>Yanna-GPT4</span>
-          </a>
-          <a href="#" className="flex items-center space-x-3 px-2 py-1.5 rounded text-sm text-gray-400 hover:bg-gray-800 hover:text-white">
-            <Code2 size={18} />
-            <span>React + TS + Vite</span>
-          </a>
-          <a href="#" className="flex items-center space-x-3 px-2 py-1.5 rounded text-sm text-gray-400 hover:bg-gray-800 hover:text-white">
-            <Settings size={18} />
-            <span>Settings</span>
-          </a>
-        </nav>
+      <div className="flex-grow overflow-y-auto -mx-2">
+        <FileTree 
+          files={mockFileTree} 
+          selectedFile={selectedFile}
+          onSelectFile={onSelectFile}
+        />
       </div>
-    </div>
+      <div className="mt-auto">
+        {/* Can add footer elements here if needed */}
+      </div>
+    </aside>
   );
 };
