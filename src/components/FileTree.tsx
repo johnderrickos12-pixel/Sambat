@@ -1,50 +1,105 @@
-import { Folder, File } from 'lucide-react';
+import React, { useState } from 'react';
+import { File, FolderOpen, ChevronRight, ChevronDown } from 'lucide-react';
+import { FileIcon } from './FileIcon';
+import { AnimatePresence, motion } from 'framer-motion';
+import clsx from 'clsx';
 
-const FileTree = () => {
-  const files = [
-    { name: 'src', type: 'folder', children: [
-      { name: 'components', type: 'folder', children: [
-        { name: 'Sidebar.tsx', type: 'file' },
-        { name: 'Header.tsx', type: 'file' },
-        { name: 'ChatInterface.tsx', type: 'file' },
-        { name: 'ChatMessage.tsx', type: 'file' },
-        { name: 'PromptInput.tsx', type: 'file' },
-        { name: 'FileTree.tsx', type: 'file' },
-        { name: 'Preview.tsx', type: 'file' },
-      ]},
-      { name: 'lib', type: 'folder', children: [
-        { name: 'utils.ts', type: 'file' },
-      ]},
-      { name: 'App.tsx', type: 'file' },
-      { name: 'index.css', type: 'file' },
-      { name: 'main.tsx', type: 'file' },
-    ]},
-    { name: 'index.html', type: 'file' },
-    { name: 'package.json', type: 'file' },
-    { name: 'tailwind.config.js', type: 'file' },
-    { name: 'vite.config.ts', type: 'file' },
-  ];
+export interface FileNode {
+  name: string;
+  children?: FileNode[];
+  path: string;
+}
 
-  const renderTree = (items: any[], level = 0) => {
-    return items.map((item) => (
-      <div key={item.name} style={{ paddingLeft: `${level * 1.5}rem` }}>
-        <div className="flex items-center text-sm text-gray-400 hover:bg-gray-800/50 rounded-md p-1 cursor-pointer">
-          {item.type === 'folder' ? <Folder className="w-4 h-4 mr-2 text-sky-400" /> : <File className="w-4 h-4 mr-2 text-gray-500" />}
-          <span>{item.name}</span>
-        </div>
-        {item.children && renderTree(item.children, level + 1)}
-      </div>
-    ));
+interface FileTreeProps {
+  files: FileNode[];
+  selectedFile: string | null;
+  onSelectFile: (path: string) => void;
+}
+
+const TreeNode: React.FC<{ 
+  node: FileNode; 
+  level: number;
+  selectedFile: string | null;
+  onSelectFile: (path: string) => void;
+}> = ({ node, level, selectedFile, onSelectFile }) => {
+  const [isOpen, setIsOpen] = useState(true);
+  const isFolder = !!node.children;
+
+  const handleToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isFolder) {
+      setIsOpen(!isOpen);
+    }
   };
 
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!isFolder) {
+      onSelectFile(node.path);
+    } else {
+      setIsOpen(!isOpen);
+    }
+  };
+
+  const isSelected = !isFolder && selectedFile === node.path;
+
   return (
-    <div className="bg-gray-900/70 backdrop-blur-sm border border-gray-800 rounded-lg p-4 h-full overflow-y-auto">
-      <h2 className="text-sm font-semibold text-gray-300 mb-4">File Explorer</h2>
-      <div className="space-y-1">
-        {renderTree(files)}
+    <div>
+      <div
+        className={clsx(
+          'flex items-center text-sm py-1.5 px-2 cursor-pointer rounded-md transition-colors duration-150',
+          {
+            'text-gray-300 hover:bg-gray-800': !isSelected,
+            'bg-blue-600/30 text-white': isSelected,
+          }
+        )}
+        style={{ paddingLeft: `${level * 16 + 8}px` }}
+        onClick={handleClick}
+      >
+        <div className="flex items-center flex-grow">
+          {isFolder ? (
+            <span onClick={handleToggle} className="mr-2">
+              {isOpen ? (
+                <ChevronDown size={14} className="text-gray-500" />
+              ) : (
+                <ChevronRight size={14} className="text-gray-500" />
+              )}
+            </span>
+          ) : (
+             <span className="w-6"></span>
+          )}
+
+          <div className="mr-2">
+              {isFolder ? <FolderOpen size={16} className="text-gray-500" /> : <FileIcon filename={node.name} />}
+          </div>
+          <span>{node.name}</span>
+        </div>
       </div>
+      <AnimatePresence initial={false}>
+        {isFolder && isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+            style={{ overflow: 'hidden' }}
+          >
+            {node.children?.map((child) => (
+              <TreeNode key={child.path} node={child} level={level + 1} selectedFile={selectedFile} onSelectFile={onSelectFile} />
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
 
-export default FileTree;
+export const FileTree: React.FC<FileTreeProps> = ({ files, selectedFile, onSelectFile }) => {
+  return (
+    <div className="p-2">
+      {files.map((node) => (
+        <TreeNode key={node.path} node={node} level={0} selectedFile={selectedFile} onSelectFile={onSelectFile}/>
+      ))}
+    </div>
+  );
+};
