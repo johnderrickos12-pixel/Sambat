@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Message, User, sambat } from '../data/mockData';
+import { Message } from '../data/mockData';
 import { ChatMessage } from './ChatMessage';
 import { PromptInput } from './PromptInput';
 import { Sparkles } from 'lucide-react';
@@ -36,7 +36,6 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMe
               key={msg.id}
               message={msg.text}
               author={msg.author}
-              isMe={msg.author.name === 'You'}
             />
           ))
         ) : (
