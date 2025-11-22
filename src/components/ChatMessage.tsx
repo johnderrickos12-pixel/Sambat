@@ -18,6 +18,12 @@ const Avatar: React.FC<{ author: User }> = ({ author }) => {
 };
 
 export const ChatMessage: React.FC<ChatMessageProps> = ({ message, author }) => {
+  // FIX: Add a guard clause to prevent crashing if author is undefined.
+  if (!author) {
+    // This prevents the entire app from crashing due to a malformed message.
+    return null; 
+  }
+
   const isMe = author.name !== sambat.name;
 
   const variants = {
