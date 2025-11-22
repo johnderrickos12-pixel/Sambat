@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { User, sambat } from '../data/mockData';
+import { User } from '../data/mockData';
 import { Code, User as UserIcon } from 'lucide-react';
 
 interface ChatMessageProps {
@@ -9,7 +9,8 @@ interface ChatMessageProps {
 }
 
 const Avatar: React.FC<{ author: User }> = ({ author }) => {
-  const isAI = author.name === sambat.name;
+  // FIX: Use direct string comparison instead of relying on a potentially undefined import.
+  const isAI = author?.name === 'Sambat';
   return (
     <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${isAI ? 'bg-purple-500/20 text-purple-400' : 'bg-blue-500/20 text-blue-400'}`}>
       {isAI ? <Code size={18} /> : <UserIcon size={18} />}
@@ -18,13 +19,14 @@ const Avatar: React.FC<{ author: User }> = ({ author }) => {
 };
 
 export const ChatMessage: React.FC<ChatMessageProps> = ({ message, author }) => {
-  // FIX: Add a guard clause to prevent crashing if author is undefined.
-  if (!author) {
+  // Add a guard clause to prevent crashing if author is undefined.
+  if (!author || !author.name) {
     // This prevents the entire app from crashing due to a malformed message.
     return null; 
   }
 
-  const isMe = author.name !== sambat.name;
+  // FIX: Use direct string comparison for robustness.
+  const isMe = author.name === 'You';
 
   const variants = {
     hidden: { opacity: 0, y: 20 },
