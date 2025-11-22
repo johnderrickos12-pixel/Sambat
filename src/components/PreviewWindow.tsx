@@ -1,25 +1,31 @@
 import React from 'react';
-import { Maximize, Code } from 'lucide-react';
+import { PreviewControls } from './PreviewControls';
+import { FileNode } from '../data/mockData';
 
-const PreviewWindow: React.FC = () => {
+interface PreviewWindowProps {
+  selectedFile: FileNode | null;
+}
+
+export const PreviewWindow: React.FC<PreviewWindowProps> = ({ selectedFile }) => {
   return (
-    <div className="flex flex-col h-full bg-[#0A0A0A] border-l border-gray-800">
-      <div className="flex items-center justify-between p-3 border-b border-gray-800 h-14">
-        <div className="flex items-center space-x-2">
-          <Code size={16} className="text-gray-400" />
-          <span className="text-sm font-medium text-gray-200">Preview</span>
-        </div>
-        <button className="p-1 text-gray-400 rounded hover:bg-gray-800">
-          <Maximize size={16} />
-        </button>
-      </div>
-      <div className="flex-grow p-4">
-        <div className="flex items-center justify-center w-full h-full border-2 border-dashed rounded-lg border-gray-800">
-          <p className="text-gray-600">Live preview will be rendered here.</p>
-        </div>
+    <div className="flex flex-col flex-1 h-full bg-black border-l border-gray-800">
+      <PreviewControls />
+      <div className="flex-1 p-6 overflow-auto bg-gray-900/50">
+        {selectedFile ? (
+          <div>
+            <h2 className="text-lg font-semibold text-gray-300 mb-4">{selectedFile.name}</h2>
+            <pre className="text-sm text-gray-400 bg-black p-4 rounded-md">
+              <code>
+                {`// Displaying content for ${selectedFile.name}\n\n// In a real application, this would be the actual file content.\n// For now, we're just showing a placeholder.`}
+              </code>
+            </pre>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-gray-500">Select a file to view its content</p>
+          </div>
+        )}
       </div>
     </div>
   );
 };
-
-export default PreviewWindow;
