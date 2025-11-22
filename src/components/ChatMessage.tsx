@@ -1,48 +1,43 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { User, Bot } from 'lucide-react';
+import { Bot, User } from 'lucide-react';
+import { Message } from '../../data/mockData';
 
 interface ChatMessageProps {
-  message: {
-    role: 'user' | 'assistant';
-    content: string;
-  };
+  message: Message;
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
-  const isUser = message.role === 'user';
+  const { author, content } = message;
+  const isUser = author === 'user';
 
-  const containerVariants = {
+  const variants = {
     hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        type: 'spring',
-        stiffness: 100,
-        damping: 15,
-      },
-    },
+    visible: { opacity: 1, y: 0 },
   };
 
   return (
     <motion.div
-      variants={containerVariants}
+      variants={variants}
       initial="hidden"
       animate="visible"
-      className={`flex items-start gap-4 p-4 rounded-lg my-2 ${
-        isUser ? 'bg-gray-800/30' : 'bg-transparent'
+      transition={{ duration: 0.3 }}
+      className={`flex items-start space-x-4 p-4 rounded-lg my-2 ${
+        isUser ? '' : 'bg-white/5'
       }`}
     >
       <div
         className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-          isUser ? 'bg-blue-600/50' : 'bg-gray-700/50'
+          isUser ? 'bg-blue-500' : 'bg-gray-700'
         }`}
       >
-        {isUser ? <User size={18} /> : <Bot size={18} />}
+        {isUser ? <User size={20} /> : <Bot size={20} />}
       </div>
-      <div className="flex-grow pt-1">
-        <p className="text-gray-200 whitespace-pre-wrap">{message.content}</p>
+      <div className="flex-1">
+        <p className="font-semibold capitalize">{author}</p>
+        <div className="prose prose-invert max-w-none text-gray-300">
+          {content}
+        </div>
       </div>
     </motion.div>
   );
