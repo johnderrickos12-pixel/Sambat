@@ -1,72 +1,57 @@
-import React, { useState, useRef, useEffect, KeyboardEvent } from 'react';
-import { Button } from './ui/button';
-import { ArrowUp, Paperclip, Mic } from 'lucide-react';
+import React, { useState } from 'react';
+import { Send, Plus, Mic } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface PromptInputProps {
   onSendMessage: (message: string) => void;
-  isLoading: boolean;
 }
 
-export const PromptInput: React.FC<PromptInputProps> = ({ onSendMessage, isLoading }) => {
-  const [prompt, setPrompt] = useState('');
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+const PromptInput: React.FC<PromptInputProps> = ({ onSendMessage }) => {
+  const [inputValue, setInputValue] = useState('');
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setPrompt(e.target.value);
-  };
-
-  const handleSendMessage = () => {
-    if (prompt.trim() && !isLoading) {
-      onSendMessage(prompt.trim());
-      setPrompt('');
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (inputValue.trim()) {
+      onSendMessage(inputValue.trim());
+      setInputValue('');
     }
   };
-
-  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
-
-  useEffect(() => {
-    const textarea = textareaRef.current;
-    if (textarea) {
-      textarea.style.height = 'auto';
-      const scrollHeight = textarea.scrollHeight;
-      textarea.style.height = `${scrollHeight}px`;
-    }
-  }, [prompt]);
 
   return (
-    <div className="relative w-full max-w-4xl mx-auto">
-      <div className="relative flex items-end p-2 bg-[rgba(23,23,23,0.8)] border border-neutral-700 rounded-2xl shadow-lg backdrop-blur-md">
-        <Button variant="ghost" size="icon" className="text-neutral-400 hover:text-white">
-          <Paperclip size={20} />
-        </Button>
-        <textarea
-          ref={textareaRef}
-          value={prompt}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          placeholder="Message Yanna..."
-          className="flex-1 bg-transparent text-white placeholder-neutral-500 resize-none focus:outline-none max-h-48 text-sm px-2"
-          rows={1}
-          disabled={isLoading}
-        />
-        <Button variant="ghost" size="icon" className="text-neutral-400 hover:text-white mr-1">
-          <Mic size={20} />
-        </Button>
-        <motion.button
-            onClick={handleSendMessage}
-            disabled={!prompt.trim() || isLoading}
-            className="bg-white text-black rounded-full p-2 disabled:bg-neutral-600 disabled:cursor-not-allowed transition-colors duration-200"
-            whileTap={{ scale: 0.95 }}
-        >
-            <ArrowUp size={20} />
-        </motion.button>
+    <div className="w-full px-4 pb-4">
+      <div className="relative w-full max-w-4xl mx-auto">
+        <form onSubmit={handleSubmit} className="relative">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="relative flex items-center bg-gray-900/80 backdrop-blur-md border border-gray-700/50 rounded-full shadow-lg p-2"
+          >
+            <button type="button" className="p-2 text-gray-400 hover:text-white transition-colors">
+              <Plus size={20} />
+            </button>
+            <input
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              placeholder="Ask Yanna..."
+              className="flex-grow bg-transparent text-white placeholder-gray-500 focus:outline-none px-4"
+            />
+            <button type="button" className="p-2 text-gray-400 hover:text-white transition-colors">
+              <Mic size={20} />
+            </button>
+            <button
+              type="submit"
+              className="bg-blue-600 hover:bg-blue-500 text-white rounded-full p-3 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!inputValue.trim()}
+            >
+              <Send size={20} />
+            </button>
+          </motion.div>
+        </form>
       </div>
     </div>
   );
 };
+
+export default PromptInput;
